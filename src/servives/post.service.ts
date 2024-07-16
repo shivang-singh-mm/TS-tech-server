@@ -8,7 +8,7 @@ interface post {
     description: string;
     tags: string[];
     landmark: string;
-    postedBy: string;
+    userId: string;
 }
 
 export class Post {
@@ -23,6 +23,29 @@ export class Post {
 
     async getPost(data: any) {
         return this.postDB.findMany(data)
+    }
+
+    async getGeneralisedFeed(userId: any) {
+        const page = 1, pageSize = 10
+        const skip = (page - 1) * pageSize;
+        return this.postDB.findMany({
+            where: {
+                userId: userId
+            },
+            skip: skip,
+            take: pageSize,
+            orderBy: {
+                date: 'desc',
+            },
+            include: {
+                _count: {
+                    select: {
+                        comment: true,
+                        like: true,
+                    },
+                },
+            },
+        });
     }
 
 }

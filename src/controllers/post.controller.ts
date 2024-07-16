@@ -9,11 +9,11 @@ export const postCreate = async (req: Request, res: Response) => {
         description: req.body.description,
         tags: req.body.tags != "" ? JSON.parse(req.body.tags) : " ",
         landmark: req.body.landmark,
-        postedBy: req.body.userId
+        userId: req.body.userId
     }
 
     try {
-        if (!data.mediaLink || !data.postedBy || data.mediaLink == " " || data.postedBy == " ") {
+        if (!data.mediaLink || !data.userId || data.mediaLink == " " || data.userId == " ") {
             console.log("Data not provided");
             return res.status(422).json({ success: false, message: "Data Incomplete" })
         }

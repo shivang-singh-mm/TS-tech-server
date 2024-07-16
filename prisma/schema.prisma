@@ -9,44 +9,51 @@ datasource db {
 }
 
 enum PURPOSE {
+  ENTREPRENEUR
+  STUDENT
+  BUSINESS
+  SERVICE_PROVIDER
+  FREELANCER
+  EMPLOYEE
+  RECRUITER
+  INVESTOR
   NETWORK
-  GETHIRED
-  TOHIRE
 }
 
-enum COMMENTSTYPES {
+enum COMMENTTYPES {
   POST
   COMMENT
 }
 
-enum LIKEDTYPES {
+enum LIKETYPES {
   POST
   COMMENT
 }
 
 model users {
-  userId           String        @id @default(uuid())
+  userId           String     @id @default(uuid())
   name             String
-  email            String        @unique
+  email            String     @unique
   password         String
-  isAdmin          Boolean       @default(false)
-  phone            String?       @unique @default("")
-  phoneCode        String?       @default("")
-  city             String?       @default("")
-  purpose          PURPOSE       @default(NETWORK)
-  githubURL        String?       @default("")
-  linkedInURL      String?       @default("")
-  aboutYou         String?       @default("")
-  aboutJobTitle    String?       @default("")
-  bio              String?       @default("")
-  aspirations      String?       @default("")
+  isAdmin          Boolean    @default(false)
+  phone            String?    @unique @default("")
+  phoneCode        String?    @default("")
+  city             String?    @default("")
+  purpose          PURPOSE    @default(NETWORK)
+  githubURL        String?    @default("")
+  linkedInURL      String?    @default("")
+  aboutYou         String?    @default("")
+  aboutJobTitle    String?    @default("")
+  bio              String?    @default("")
+  aspirations      String?    @default("")
   profilePic       String?
-  followers        follow[]      @relation("UserFollowers")
-  following        follow[]      @relation("UserFollowing")
-  timelineOfEvents timeline[]    @relation("Timeline")
+  followers        follow[]   @relation("UserFollowers")
+  following        follow[]   @relation("UserFollowing")
+  timelineOfEvents timeline[] @relation("Timeline")
   post             post[]
-  likePost         likePost[]
-  commentPost      commentPost[]
+  likePost         like[]
+  commentPost      comment[]
+  history          history[]
 }
 
 model follow {
@@ -71,34 +78,54 @@ model timeline {
 }
 
 model post {
-  id          String        @id @default(uuid())
-  date        DateTime      @default(now())
+  id          String    @id @default(uuid())
+  date        DateTime  @default(now())
   mediaLink   String[]
   caption     String
   description String
   tags        String[]
   landmark    String
-  user        users         @relation(fields: [postedBy], references: [userId])
-  postedBy    String
-  likePost    likePost[]
-  commentPost commentPost[]
+  user        users     @relation(fields: [userId], references: [userId])
+  userId      String
+  like        like[]
+  comment     comment[]
 }
 
-model commentPost {
-  id          String        @id @default(uuid())
-  user        users         @relation(fields: [commentedBy], references: [userId])
-  commentedBy String
-  text        String
-  media       String[]
-  commentedOn COMMENTSTYPES
-  post        post          @relation(fields: [postId], references: [id])
-  postId      String
+model comment {
+  id              String       @id @default(uuid())
+  user            users        @relation(fields: [userId], references: [userId])
+  userId          String
+  date            DateTime     @default(now())
+  text            String
+  media           String[]
+  post            post?        @relation(fields: [postId], references: [id])
+  postId          String?
+  parentCommentId String?
+  commentId       comment?     @relation("CommentAndReply", fields: [parentCommentId], references: [id])
+  comment         comment[]    @relation("CommentAndReply")
+  like            like[]
+  mentionMail     String
+  commentType     COMMENTTYPES
 }
 
-model likePost {
-  id     String @id @default(uuid())
-  post   post   @relation(fields: [postId], references: [id])
-  user   users  @relation(fields: [userId], references: [userId])
-  userId String
-  postId String
+model like {
+  id        String    @id @default(uuid())
+  post      post?     @relation(fields: [postId], references: [id])
+  user      users     @relation(fields: [userId], references: [userId])
+  userId    String
+  postId    String?
+  comment   comment?  @relation(fields: [commentId], references: [id])
+  commentId String?
+  likeType  LIKETYPES
+}
+
+model history {
+  id          String    @id @default(uuid())
+  startDate   DateTime
+  endDate     DateTime?
+  title       String
+  description String
+  users       users     @relation(fields: [usersId], references: [userId])
+  usersId     String
+  tags        String[]
 }
