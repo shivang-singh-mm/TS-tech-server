@@ -5,6 +5,7 @@ import { PrismaClient, follow, users } from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
 
 import bcrypt from "bcrypt";
+import { User } from "../servives/user.services";
 
 const prisma = new PrismaClient();
 
@@ -223,12 +224,14 @@ export const addTimelineEvent = async (
     const StartDate: string = req.body.startDate;
     const EndDate: string = req.body.endDate;
     const Description: string = req.body.desc;
+    const Title: string = req.body.title;
     const timelineTransaction = await prisma.timeline.create({
       data: {
         userRefId: userId,
         startDate: StartDate,
         endDate: EndDate,
         description: Description,
+        title: Title
       },
     });
     res.status(StatusCodes.ACCEPTED).json(timelineTransaction);
@@ -257,3 +260,31 @@ export const getTimelineEvents = async (
     next(error);
   }
 };
+
+
+
+export const getGeneralizeduser = async (req: Request, res: Response) => {
+  const data = {
+    userId: req.body.userId ? req.body.userId : null,
+    email: req.body.email ? req.body.email : null
+  }
+  try {
+    if (data.userId && data.email)
+      return res.status(409).json({ success: false, message: "Enter either email or id of user" })
+    const user = new User;
+    const body = await user.getGeneralisedUser(data.userId, data.email);
+    return res.status(200).json({ success: true, message: "Successfully retrieved generalized user", body: body })
+  }
+  catch (err) {
+    console.log(err);
+    return res.status(400).json({ success: false, message: "Unable to get generalizedUser" });
+  }
+}
+
+const getUserProfile = async (req: Request, res: Response) => {
+
+}
+
+const getFiltereduser = (req: Request, res: Response) => {
+
+}

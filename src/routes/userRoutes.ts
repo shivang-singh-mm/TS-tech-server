@@ -1,4 +1,5 @@
 import { Router, Request, Response } from "express";
+import { io } from "..";
 
 import {
   LoginUser,
@@ -78,7 +79,12 @@ router.get(
 );
 
 router.get("/healthCheck", (req: Request, res: Response) => {
+  io.emit('updateNotifications2', "This is notification pannel2");
   res.send({ Health: "Prod Healt Check Fine", Version: "v0.0" })
 })
 
+router.get('/noti', (req: Request, res: Response) => {
+  io.emit('updateNotifications', "This is notification pannel");
+  res.send({ Health: "Prod Healt Check Fine", Version: "v0.0" })
+})
 export default router;

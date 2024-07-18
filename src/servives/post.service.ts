@@ -38,6 +38,7 @@ export class Post {
                 date: 'desc',
             },
             include: {
+                like: true,
                 _count: {
                     select: {
                         comment: true,

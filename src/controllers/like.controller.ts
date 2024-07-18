@@ -63,4 +63,22 @@ export const getLikeCount = async (req: Request, res: Response) => {
 }
 
 
+export const deleteLike = async (req: Request, res: Response) => {
+    const data = {
+        postId: req.body.postId,
+        commentId: req.body.commentId,
+        userId: req.body.userId
+    }
+    try {
+        if ((data.postId == "" || data.postId == " ") && (data.commentId == "" || data.commentId == " "))
+            return res.status(409).json({ success: false, message: "Enter valid inputs" })
+        const like = new Like;
+        const body = await like.deleteLike(data.postId, data.commentId, data.userId);
+        return res.status(200).json({ success: true, message: "Successfully deleted likes", body: body })
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(400).json({ success: false, message: "Unable to delete like counts" });
+    }
+}
 

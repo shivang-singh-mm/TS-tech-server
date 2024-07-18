@@ -35,7 +35,7 @@ export class Like {
         })
     }
 
-    async getPostLikeCount(postId: any) {
+    async getPostLikeCount(postId: string) {
         return this.likeDB.count({
             where: {
                 postId: postId
@@ -43,15 +43,13 @@ export class Like {
         })
     }
 
-    // async createCommentLike(data: likesInterface) {
-    //     return this.likePostDB.create({ data })
-    // }
 
-    async deleteLike(postId: any, userId: any) {
+    async deleteLike(postId: string, userId: string, commentId: string) {
         return this.likeDB.deleteMany({
             where: {
                 postId: postId,
-                userId: userId
+                userId: userId,
+                commentId: commentId
             }
         })
     }
