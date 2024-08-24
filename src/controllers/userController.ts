@@ -5,9 +5,11 @@ import { PrismaClient, follow, users } from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
 
 import bcrypt from "bcrypt";
+import { sign } from "jsonwebtoken";
 import { User } from "../servives/user.services";
 
 const prisma = new PrismaClient();
+const privatekey: any = process.env.PRIVATE_KEY;
 
 export const RegisterUser = async (
   req: Request,
@@ -19,6 +21,10 @@ export const RegisterUser = async (
     const hashedPassword: string = await bcrypt.hash(req.body.password, salt);
     req.body.password = hashedPassword;
     const user: users = await prisma.users.create({ data: req.body });
+    if (req.body.isAdmin == false) {
+      const userFollow = new User;
+      await userFollow.followOfficialAccounts(user.userId);
+    }
     res.status(StatusCodes.ACCEPTED).json(user);
   } catch (error) {
     next(error);
@@ -50,9 +56,8 @@ export const LoginUser = async (
           .status(StatusCodes.BAD_REQUEST)
           .json({ message: "Invalid password" });
       }
-      req.session.loggedIn = true;
-      req.session.admin = loginUser.isAdmin;
-      return res.status(StatusCodes.ACCEPTED).json(loginUser);
+      var token = sign({ uuid: loginUser.userId }, privatekey)
+      return res.status(StatusCodes.ACCEPTED).json({ loginUser, token });
     }
   } catch (error) {
     next(error);
@@ -265,11 +270,11 @@ export const getTimelineEvents = async (
 
 export const getGeneralizeduser = async (req: Request, res: Response) => {
   const data = {
-    userId: req.body.userId ? req.body.userId : null,
-    email: req.body.email ? req.body.email : null
+    userId: req.query.userId ? req.query.userId.toString().trim() : null,
+    email: req.query.email ? req.query.email.toString().trim() : null
   }
   try {
-    if (data.userId && data.email)
+    if ((data.userId && data.email) || ((!data.userId && !data.email)))
       return res.status(409).json({ success: false, message: "Enter either email or id of user" })
     const user = new User;
     const body = await user.getGeneralisedUser(data.userId, data.email);
@@ -285,6 +290,71 @@ const getUserProfile = async (req: Request, res: Response) => {
 
 }
 
-const getFiltereduser = (req: Request, res: Response) => {
+export const getFiltereduser = async (req: Request, res: Response) => {
+  const data = {
+    userId: req.params.userId,
+    name: req.query.name ? req.query.name.toString().trim() : null,
+    sector: req.query.sector ? req.query.sector.toString().trim() : null,
+    city: req.query.city ? req.query.city.toString().trim() : null,
+    jobTitle: req.query.jobTitle ? req.query.jobTitle.toString().trim() : null,
+    experience: req.query.experience ? req.query.experience.toString().trim() : null
+  }
+  try {
+    // if ((data.userId && data.email) || ((!data.userId && !data.email)))
+    //   return res.status(409).json({ success: false, message: "Enter either email or id of user" })
+    const user = new User;
+    const body = await user.getFiltereduser(data.userId, data.name, data.city, data.sector, data.experience, data.jobTitle);
+    return res.status(200).json({ success: true, message: "Successfully retrieved filtered user", body: body })
+  }
+  catch (err) {
+    console.log(err);
+    return res.status(400).json({ success: false, message: "Unable to get filteredUser" });
+  }
+}
 
+
+export const updateUSerInfo = async (req: Request, res: Response) => {
+  const data = {
+    githubURL: req.body.githubURL,
+    companyId: req.body.companyId,
+    purpose: req.query.sector,
+    city: req.body.city,
+    jobTitle: req.body.jobTitle,
+    aboutJobTitle: req.body.aboutJobTitle,
+    linkedInURL: req.body.linkedInURL,
+    experience: req.query.experience
+  }
+  const userId = req.body.userId;
+  try {
+    if (!userId || userId == " ")
+      return res.status(409).json({ success: false, message: "Enter id of user" })
+    const user = new User;
+    const body = await user.updateUserInfo(data, userId);
+    return res.status(200).json({ success: true, message: "Successfully updated user", body: body })
+  }
+  catch (err) {
+    console.log(err);
+    return res.status(400).json({ success: false, message: "Unable to update user" });
+  }
+}
+
+
+export const updateUerProfile = async (req: Request, res: Response) => {
+  const data = {
+    bio: req.body.bio,
+    aspirations: req.body.aspirations,
+    profilePic: req.body.profilePic
+  }
+  const userId = req.body.userId;
+  try {
+    if (!userId || userId == " ")
+      return res.status(409).json({ success: false, message: "Enter id of user" })
+    const user = new User;
+    const body = await user.updateUserInfo(data, userId);
+    return res.status(200).json({ success: true, message: "Successfully updated user", body: body })
+  }
+  catch (err) {
+    console.log(err);
+    return res.status(400).json({ success: false, message: "Unable to update user" });
+  }
 }

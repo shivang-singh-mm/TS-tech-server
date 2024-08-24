@@ -2,20 +2,19 @@ import * as express from "express";
 import bodyParser from "body-parser";
 import "dotenv/config";
 import router from "./routes/userRoutes";
-import { redisClient, activateRedis } from "../redis/connectRedis";
-import session from "express-session";
-import RedisStore from "connect-redis";
 import { errorHandler } from "./errorHandlerMiddleware/errorHandler";
 import * as socketio from "socket.io";
 // import { CorsOptions }, cors from "cors";
 import cors from 'cors';
 import http from 'http'
+import cookieParser from "cookie-parser";
 
 const app = express.default();
 const PORT = process.env.PORT;
 
 // activateRedis(redisClient);
 
+app.use(cookieParser())
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -26,12 +25,18 @@ app.use(bodyParser.json());
 //     resave: false,
 //     saveUninitialized: true,
 //     cookie: {
-//       maxAge: 365 * 86400 * 1000,
+//       maxAge: 365 * 60 * 60 * 60 * 1000
+//       // parseInt(sessionDuration),
 //     },
 //   })
 // );
 
-app.use(cors())
+app.use(cors(
+  {
+    origin: 'http://localhost:3000', // Your frontend's origin
+    credentials: true // Allow cookies to be sent with requests
+  }
+))
 
 app.use("/api/v1/users", router);
 

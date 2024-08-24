@@ -1,4 +1,4 @@
-import { PrismaClient, comment } from "@prisma/client";
+import { $Enums, PrismaClient, comment } from "@prisma/client";
 
 const prisma = new PrismaClient;
 
@@ -7,8 +7,9 @@ interface commentsInterface {
     text: string;
     media: string[];
     postId: string;
-    commentType: any;
-    mentionMail: any
+    commentType: $Enums.COMMENTTYPES;
+    mentionMail: string | null;
+    parentCommentId: string | null;
 }
 
 export class Comment {
@@ -19,18 +20,20 @@ export class Comment {
         this.userDB = prisma.users;
     }
 
-    async createPostComment(data: commentsInterface, mentionId: any) {
-        const userEmail = await this.userDB.findUnique({
-            where: {
-                userId: mentionId
-            },
-            select: {
-                email: true
-            }
-        })
-        if (userEmail?.email == null) throw new Error("User does not exists");
-        data.mentionMail = userEmail;
-        return this.commentDB.create({ data })
+    async createComment(data: any, mentionId: string | null) {
+        if (mentionId) {
+            const userEmail = await this.userDB.findUnique({
+                where: {
+                    userId: mentionId
+                },
+                select: {
+                    email: true
+                }
+            });
+            if (userEmail?.email == null) throw new Error("User does not exists");
+            data.mentionMail = userEmail.email;
+        }
+        return this.commentDB.create({ data });
     }
 
     async getComment(postId: any) {
@@ -38,7 +41,7 @@ export class Comment {
             where: {
                 postId: postId
             }
-        })
+        });
     }
 
     async getCommentCount(postId: any) {
@@ -49,25 +52,27 @@ export class Comment {
         })
     }
 
-    async getGeneralizedComments(postId: any) {
-        const page = 1, pageSize = 10
+    async getGeneralizedComments(postId: string | null, commentId: string | null, page: number, pageSize: number) {
         const skip = (page - 1) * pageSize;
         return this.commentDB.findMany({
             where: {
-                postId: postId
-            },
-            orderBy: {
-                date: 'desc',
+                postId: postId,
+                parentCommentId: commentId
             },
             skip: skip,
             take: pageSize,
+            orderBy: {
+                date: 'desc',
+            },
             include: {
+                like: true,
                 _count: {
                     select: {
                         comment: true,
                         like: true
                     },
                 },
+                user: true
             },
         })
     }

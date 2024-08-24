@@ -8,11 +8,15 @@ import {
   deleteUserById,
   followUserById,
   getAllUsers,
+  getFiltereduser,
   getFollowersById,
   getFollowersCountById,
   getFollowingById,
+  getGeneralizeduser,
   getTimelineEvents,
   unfollowUserById,
+  updateUSerInfo,
+  updateUerProfile,
 } from "../controllers/userController";
 
 import {
@@ -32,56 +36,113 @@ import {
   checkAdmin,
   checkLoggedIn,
 } from "../authorisationMiddleware/userAuthMiddleware";
-import { any } from "zod";
+import { jwtVerify } from "../authorisationMiddleware/jwt.auth";
+import { getGeneralizedFeed, getUserFeed, postCreate } from "../controllers/post.controller";
+import { createLike, deleteLike, getLike } from "../controllers/like.controller";
+import { createComment, getComment } from "../controllers/comment.controller";
+import { createHistory, deleteHistory, getHistory } from "../controllers/history.controller";
+import { recommendationAPI } from "../controllers/activity.controller";
+import { createView, getView } from "../controllers/profile.view.controller";
+import { sendEmailForOtp } from "../controllers/send.email";
 
 const router: Router = Router();
 
 router.post("/register", userRegisterValidation, RegisterUser);
 router.post("/login", userLoginValidation, LoginUser);
-router.post("/getUsers", checkAdmin, checkLoggedIn, getAllUsers);
+router.post("/getUsers", checkAdmin, jwtVerify, getAllUsers);
 router.delete("/deleteUser/:userId", deleteUserByIdValidation, deleteUserById);
-router.post("/follow", checkLoggedIn, followValidation, followUserById);
+router.post("/follow", jwtVerify, followValidation, followUserById);
 router.get(
   "/getFollowers/:userId",
-  checkLoggedIn,
+  jwtVerify,
   getFollowersValidation,
   getFollowersById
 );
 
 router.get(
   "/getFollowing/:userId",
-  checkLoggedIn,
+  jwtVerify,
   getFollowingValidation,
   getFollowingById
 );
 
 router.get(
   "/followCount/:userId",
-  checkLoggedIn,
+  jwtVerify,
   getFollowerCountValidation,
   getFollowersCountById
 );
 
-router.post("/unfollow", checkLoggedIn, unfollowValidation, unfollowUserById);
+router.post("/unfollow", jwtVerify, unfollowValidation, unfollowUserById);
 
 router.post(
-  "/addTimelineEvent",
-  checkLoggedIn,
+  "/timelineEvent/create",
+  jwtVerify,
   addTimelineEventValidation,
   addTimelineEvent
 );
 
 router.get(
-  "/getTimelineEvents/:userId",
-  checkLoggedIn,
+  "/timelineEvent/get/:userId",
+  jwtVerify,
   getTimelineEventsValidation,
   getTimelineEvents
 );
 
 router.get("/healthCheck", (req: Request, res: Response) => {
-  io.emit('updateNotifications2', "This is notification pannel2");
+  // io.emit('updateNotifications2', "This is notification pannel2");
   res.send({ Health: "Prod Healt Check Fine", Version: "v0.0" })
 })
+
+router.get("/checkAuth", jwtVerify, (req: Request, res: Response) => {
+  // io.emit('updateNotifications2', "This is notification pannel2");
+  res.send({ Health: "Prod Healt Check Fine", Version: "v0.0" })
+})
+
+
+
+
+// Post Routes
+
+router.post('/post/create', jwtVerify, postCreate)
+router.get('/post/get/:userId/:page/:pageSize', jwtVerify, getGeneralizedFeed)
+router.get('/post/get/user/:userId/:page/:pageSize', jwtVerify, getUserFeed);
+
+// Like Routes
+
+router.post('/like/create', jwtVerify, createLike);
+router.delete('/like/delete/:userId/', jwtVerify, deleteLike);
+router.get('/like/get', jwtVerify, getLike);
+
+
+// Comment Routes
+
+router.post('/comment/create', jwtVerify, createComment);
+router.get('/comment/get/:page/:pageSize', jwtVerify, getComment);
+
+// User Routes
+
+router.get('/get/general', jwtVerify, getGeneralizeduser);
+router.get('/get/filter/:userId', jwtVerify, getFiltereduser);
+router.get('/get/recommendation/:userId', jwtVerify, recommendationAPI);
+router.put('/update/info', jwtVerify, updateUSerInfo);
+router.put('/update/profile', jwtVerify, updateUerProfile);
+
+
+
+// Histoy Routes
+
+router.post('/history/create', jwtVerify, createHistory);
+router.get('/history/get/:userId', jwtVerify, getHistory);
+router.delete('/history/delete/:historyId', jwtVerify, deleteHistory)
+
+
+// Profile View Routes
+router.post('/profile/view/create', jwtVerify, createView);
+router.get('/profile/view/get/:email', jwtVerify, getView);
+
+
+router.get('/otp', sendEmailForOtp);
 
 router.get('/noti', (req: Request, res: Response) => {
   io.emit('updateNotifications', "This is notification pannel");

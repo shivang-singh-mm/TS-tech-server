@@ -31,31 +31,35 @@ enum LIKETYPES {
 }
 
 model users {
-  userId           String         @id @default(uuid())
+  userId           String          @id @default(uuid())
   name             String
-  email            String         @unique
+  email            String          @unique
   password         String
-  isAdmin          Boolean        @default(false)
-  phone            String?        @unique @default("")
-  phoneCode        String?        @default("")
-  city             String?        @default("")
-  purpose          PURPOSE        @default(NETWORK)
-  githubURL        String?        @default("")
-  linkedInURL      String?        @default("")
-  aboutYou         String?        @default("")
-  aboutJobTitle    String?        @default("")
-  bio              String?        @default("")
-  aspirations      String?        @default("")
+  isAdmin          Boolean         @default(false)
+  phone            String?         @unique @default("")
+  phoneCode        String?         @default("")
+  city             String?         @default("")
+  purpose          PURPOSE         @default(NETWORK)
+  githubURL        String?         @default("")
+  linkedInURL      String?         @default("")
+  aboutYou         String?         @default("")
+  bio              String?         @default("")
+  aspirations      String?         @default("")
   profilePic       String?
-  followers        follow[]       @relation("UserFollowers")
-  following        follow[]       @relation("UserFollowing")
-  timelineOfEvents timeline[]     @relation("Timeline")
+  aboutJobTitle    String?         @default("")
+  jobTitle         String?
+  companyId        String?
+  experience       String?
+  followers        follow[]        @relation("UserFollowers")
+  following        follow[]        @relation("UserFollowing")
+  timelineOfEvents timeline[]      @relation("Timeline")
   post             post[]
   likePost         like[]
   commentPost      comment[]
   history          history[]
   activity         activity[]
   notification     notification[]
+  profileViewed    profileViewed[]
 }
 
 model follow {
@@ -108,7 +112,7 @@ model comment {
   commentId       comment?     @relation("CommentAndReply", fields: [parentCommentId], references: [id])
   comment         comment[]    @relation("CommentAndReply")
   like            like[]
-  mentionMail     String
+  mentionMail     String?
   commentType     COMMENTTYPES
 }
 
@@ -148,8 +152,16 @@ model notification {
 }
 
 model activity {
-  id      String   @id @default(uuid())
-  user    users    @relation(fields: [userId], references: [userId])
-  userId  String
-  sectors String[]
+  id      String    @id @default(uuid())
+  user    users     @relation(fields: [userId], references: [userId])
+  userId  String    @unique
+  sectors PURPOSE[]
+}
+
+model profileViewed {
+  id        String   @id @default(uuid())
+  user      users    @relation(fields: [userId], references: [userId])
+  userId    String
+  date      DateTime
+  viewEmail String
 }

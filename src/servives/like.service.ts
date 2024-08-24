@@ -16,7 +16,7 @@ export class Like {
     }
 
     async createLike(data: likesInterface) {
-        if (this.likeDB.findFirst({
+        if (await this.likeDB.findFirst({
             where: {
                 postId: data.postId,
                 commentId: data.commentId,
@@ -27,10 +27,14 @@ export class Like {
         return this.likeDB.create({ data })
     }
 
-    async getPostLike(postId: any) {
+    async getLike(postId: string | null, commentId: string | null) {
         return this.likeDB.findMany({
             where: {
-                postId: postId
+                postId: postId,
+                commentId: commentId
+            },
+            include: {
+                user: true
             }
         })
     }
@@ -44,7 +48,7 @@ export class Like {
     }
 
 
-    async deleteLike(postId: string, userId: string, commentId: string) {
+    async deleteLike(postId: string | null, userId: string, commentId: string | null) {
         return this.likeDB.deleteMany({
             where: {
                 postId: postId,

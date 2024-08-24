@@ -1,0 +1,33 @@
+version: '2'
+
+services:
+  # app:
+  #   image: public.ecr.aws/e7y1f9l8/skynect-ts:v0.1
+  #   environment:
+  #     PORT: 5000
+  #     DATABASE_URL: postgres://postgres:postgres@postgres:5432
+  #     SESSION_DURATION: 1*60*1000
+  #     REDIS_PORT: 6379
+  #     REDIS_HOST: redis
+  #   ports:
+  #     - "5000:5000"
+
+  redis:
+    image: redis:latest
+    # port: 6379:6379
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    # volumes:
+    #   - ./db_init.sql:/docker-entrypoint-initdb.d/rarible_init.sql
+    ports:
+      - 5431:5432
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"

@@ -3,18 +3,18 @@ import { History } from "../servives/history.services"
 
 export const createHistory = async (req: Request, res: Response) => {
     var data = {
-        startDate: req.body.startDate,
-        endDate: req.body.endDate,
+        startDate: new Date(req.body.startDate),
+        endDate: new Date(req.body.endDate),
         title: req.body.title,
         description: req.body.description,
         userId: req.body.userId,
-        tags: req.body.tags != null || req.body.tags != " " ? JSON.parse(req.body.tags) : null,
+        tags: req.body.tags,
         purpose: req.body.purpose
     }
     try {
         if (data.title == "" || data.title == " ")
             return res.status(409).json({ success: false, message: "Enter valid inputs" })
-        if ((data.userId == "" || data.userId == " ") || (data.startDate == " " || data.startDate == " "))
+        if ((data.userId == "" || data.userId == " ") || (!data.startDate))
             return res.status(409).json({ success: false, message: "Enter valid inputs" })
         const history = new History;
         const body = await history.createHistory(data);
@@ -30,7 +30,7 @@ export const createHistory = async (req: Request, res: Response) => {
 
 export const getHistory = async (req: Request, res: Response) => {
     var data = {
-        userId: req.body.userId,
+        userId: req.params.userId,
     }
     try {
         if (data.userId == "" || data.userId == " ")
@@ -47,7 +47,7 @@ export const getHistory = async (req: Request, res: Response) => {
 
 export const deleteHistory = async (req: Request, res: Response) => {
     var data = {
-        id: req.body.id,
+        id: req.params.historyId,
     }
     try {
         if (data.id == "" || data.id == " ")
