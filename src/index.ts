@@ -33,7 +33,7 @@ app.use(bodyParser.json());
 
 app.use(cors(
   {
-    origin: 'https://starlit-lollipop-0f4e22.netlify.app/', // Your frontend's origin
+    origin: 'https://starlit-lollipop-0f4e22.netlify.app', // Your frontend's origin
     credentials: true // Allow cookies to be sent with requests
   }
 ))
