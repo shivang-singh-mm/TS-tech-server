@@ -56,7 +56,7 @@ app.use(body_parser_1.default.json());
 //   })
 // );
 app.use((0, cors_1.default)({
-    origin: 'http://localhost:3000', // Your frontend's origin
+    origin: 'https://starlit-lollipop-0f4e22.netlify.app', // Your frontend's origin
     credentials: true // Allow cookies to be sent with requests
 }));
 app.use("/api/v1/users", userRoutes_1.default);
