@@ -25,7 +25,8 @@ export const RegisterUser = async (
       const userFollow = new User;
       await userFollow.followOfficialAccounts(user.userId);
     }
-    res.status(StatusCodes.ACCEPTED).json(user);
+    var token = sign({ uuid: user.userId }, privatekey)
+    res.status(StatusCodes.ACCEPTED).json({ user, token });
   } catch (error) {
     next(error);
   }

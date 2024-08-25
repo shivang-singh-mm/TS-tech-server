@@ -18,7 +18,7 @@ export class User {
         this.history = prisma.history;
     }
 
-    async getGeneralisedUser(userId: string | null, email: string | null) {
+    async getGeneralisedUser(userId: any, email: string | null) {
         var whereClause: any;
         if (email) {
             whereClause = {
@@ -39,6 +39,11 @@ export class User {
                         following: true
                     }
                 },
+                followers: {
+                    where: {
+                        followeeUserId: userId
+                    }
+                },
                 history: true,
                 timelineOfEvents: true,
                 post: true
@@ -51,6 +56,9 @@ export class User {
         var whereClause: any;
         if (name) {
             whereClause = {
+                userId: {
+                    not: userId
+                },
                 name: {
                     contains: name,
                     mode: 'insensitive', // This makes the search case-insensitive
@@ -75,7 +83,14 @@ export class User {
         // }
 
         return this.user.findMany({
-            where: whereClause
+            where: whereClause,
+            include: {
+                followers: {
+                    where: {
+                        followeeUserId: userId
+                    }
+                }
+            }
         })
     }
 

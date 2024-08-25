@@ -62,16 +62,20 @@ export class Activity {
             }
         });
         if (check == null) {
-            const purpose: any = await this.userDB.findUnique({
-                where: {
-                    userId: userId
-                },
-                select: {
-                    purpose: true
-                }
-            })
+            // const purpose: any = await this.userDB.findUnique({
+            //     where: {
+            //         userId: userId
+            //     },
+            //     select: {
+            //         purpose: true
+            //     }
+            // })
             return this.userDB.findMany({
-                // n
+                where: {
+                    userId: {
+                        not: userId
+                    },
+                },
                 take: 9
             })
         }

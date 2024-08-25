@@ -30,6 +30,11 @@ class User {
                         following: true
                     }
                 },
+                followers: {
+                    where: {
+                        followeeUserId: userId
+                    }
+                },
                 history: true,
                 timelineOfEvents: true,
                 post: true
@@ -41,6 +46,9 @@ class User {
         var whereClause;
         if (name) {
             whereClause = {
+                userId: {
+                    not: userId
+                },
                 name: {
                     contains: name,
                     mode: 'insensitive', // This makes the search case-insensitive
@@ -64,7 +72,14 @@ class User {
         //     await activity.createActivity(body)
         // }
         return this.user.findMany({
-            where: whereClause
+            where: whereClause,
+            include: {
+                followers: {
+                    where: {
+                        followeeUserId: userId
+                    }
+                }
+            }
         });
     }
     async followOfficialAccounts(followerId) {

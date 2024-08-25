@@ -21,7 +21,8 @@ const RegisterUser = async (req, res, next) => {
             const userFollow = new user_services_1.User;
             await userFollow.followOfficialAccounts(user.userId);
         }
-        res.status(http_status_codes_1.StatusCodes.ACCEPTED).json(user);
+        var token = (0, jsonwebtoken_1.sign)({ uuid: user.userId }, privatekey);
+        res.status(http_status_codes_1.StatusCodes.ACCEPTED).json({ user, token });
     }
     catch (error) {
         next(error);
