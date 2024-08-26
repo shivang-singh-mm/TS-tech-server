@@ -68,12 +68,13 @@ export class User {
 
     async getFiltereduser(userId: string, name: string | null, city: string | null, purpose: string | null, experience: string | null, jobTitle: string | null) {
         // var wname = name;
-        var whereClause: any;
+        var whereClause: any = {
+            userId: {
+                not: userId
+            }
+        };
         if (name) {
             whereClause = {
-                userId: {
-                    not: userId
-                },
                 name: {
                     contains: name,
                     mode: 'insensitive', // This makes the search case-insensitive
@@ -81,21 +82,22 @@ export class User {
             };
         }
         // var sectors: any = PURPOSE[purpose];
-        if (city)
-            whereClause.city = city;
-        // if (experience)
-        //     whereClause.experience = experience;
+        // if (city)
+        //     whereClause.city = city;
+        // console.log(purpose, experience, jobTitle, name, "hhh")
+        if (experience != null)
+            whereClause.experience = experience;
         // if (jobTitle)
         //     whereClause.jobTitle = jobTitle
-        // if (purpose) {
-        //     whereClause.purpose = purpose;
-        //     const activity = new Activity;
-        //     const body: activity = {
-        //         userId: userId,
-        //         sectors: purpose
-        //     }
-        //     await activity.createActivity(body)
-        // }
+        if (purpose != null && purpose != 'All') {
+            whereClause.purpose = purpose;
+            const activity = new Activity;
+            const body: activity = {
+                userId: userId,
+                sectors: purpose
+            }
+            await activity.createActivity(body)
+        }
 
         return this.user.findMany({
             where: whereClause,

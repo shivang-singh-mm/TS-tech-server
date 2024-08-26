@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const client_1 = require("@prisma/client");
+const activity_services_1 = require("./activity.services");
 const prisma = new client_1.PrismaClient;
 class User {
     constructor() {
@@ -58,12 +59,13 @@ class User {
     }
     async getFiltereduser(userId, name, city, purpose, experience, jobTitle) {
         // var wname = name;
-        var whereClause;
+        var whereClause = {
+            userId: {
+                not: userId
+            }
+        };
         if (name) {
             whereClause = {
-                userId: {
-                    not: userId
-                },
                 name: {
                     contains: name,
                     mode: 'insensitive', // This makes the search case-insensitive
@@ -71,21 +73,22 @@ class User {
             };
         }
         // var sectors: any = PURPOSE[purpose];
-        if (city)
-            whereClause.city = city;
-        // if (experience)
-        //     whereClause.experience = experience;
+        // if (city)
+        //     whereClause.city = city;
+        // console.log(purpose, experience, jobTitle, name, "hhh")
+        if (experience != null)
+            whereClause.experience = experience;
         // if (jobTitle)
         //     whereClause.jobTitle = jobTitle
-        // if (purpose) {
-        //     whereClause.purpose = purpose;
-        //     const activity = new Activity;
-        //     const body: activity = {
-        //         userId: userId,
-        //         sectors: purpose
-        //     }
-        //     await activity.createActivity(body)
-        // }
+        if (purpose != null && purpose != 'All') {
+            whereClause.purpose = purpose;
+            const activity = new activity_services_1.Activity;
+            const body = {
+                userId: userId,
+                sectors: purpose
+            };
+            await activity.createActivity(body);
+        }
         return this.user.findMany({
             where: whereClause,
             include: {
