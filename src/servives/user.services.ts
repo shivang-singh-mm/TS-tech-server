@@ -123,5 +123,14 @@ export class User {
         })
     }
 
+    async checkFollow(userId: any, foreignId: any) {
+        return this.follow.findMany({
+            where: {
+                followeeUserId: userId,
+                followerUserId: foreignId
+            }
+        })
+    }
+
 }
 

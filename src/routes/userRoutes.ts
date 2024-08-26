@@ -5,6 +5,7 @@ import {
   LoginUser,
   RegisterUser,
   addTimelineEvent,
+  checkFollow,
   deleteUserById,
   followUserById,
   getAllUsers,
@@ -127,6 +128,7 @@ router.get('/get/filter/:userId', jwtVerify, getFiltereduser);
 router.get('/get/recommendation/:userId', jwtVerify, recommendationAPI);
 router.put('/update/info', jwtVerify, updateUSerInfo);
 router.put('/update/profile', jwtVerify, updateUerProfile);
+router.post('/check/follow', jwtVerify, checkFollow);
 
 
 

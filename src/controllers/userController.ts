@@ -359,3 +359,21 @@ export const updateUerProfile = async (req: Request, res: Response) => {
     return res.status(400).json({ success: false, message: "Unable to update user" });
   }
 }
+
+export const checkFollow = async (req: Request, res: Response) => {
+  const data = {
+    userId: req.body.userId,
+    foreignId: req.body.foreignId
+  }
+  try {
+    if (!data.userId || data.userId == " " || !data.foreignId || data.foreignId == " ")
+      return res.status(409).json({ success: false, message: "Enter id of user" })
+    const user = new User;
+    const body = await user.checkFollow(data.userId, data.foreignId);
+    return res.status(200).json({ success: true, message: "Successfully checked follow", body: body })
+  }
+  catch (err) {
+    console.log(err);
+    return res.status(400).json({ success: false, message: "Unable to check follow" });
+  }
+}

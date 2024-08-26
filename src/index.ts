@@ -11,6 +11,7 @@ import cookieParser from "cookie-parser";
 
 const app = express.default();
 const PORT = process.env.PORT;
+const originUrl = process.env.ALLOW_ORIGIN_URL
 
 // activateRedis(redisClient);
 
@@ -33,7 +34,7 @@ app.use(bodyParser.json());
 
 app.use(cors(
   {
-    origin: 'https://starlit-lollipop-0f4e22.netlify.app', // Your frontend's origin
+    origin: originUrl, // Your frontend's origin
     credentials: true // Allow cookies to be sent with requests
   }
 ))
