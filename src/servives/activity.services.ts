@@ -62,27 +62,33 @@ export class Activity {
             }
         });
         if (check == null) {
-            // const purpose: any = await this.userDB.findUnique({
-            //     where: {
-            //         userId: userId
-            //     },
-            //     select: {
-            //         purpose: true
-            //     }
-            // })
             return this.userDB.findMany({
                 where: {
                     userId: {
                         not: userId
                     },
                 },
-                take: 9
+                take: 9,
+                include: {
+                    followers: {
+                        where: {
+                            followeeUserId: userId
+                        }
+                    }
+                }
             })
         }
         else {
             const queries: any = check.sectors.map(sector => ({
                 where: { purpose: sector },
                 take: 3,
+                include: {
+                    followers: {
+                        where: {
+                            followeeUserId: userId
+                        }
+                    }
+                }
             }));
             return await Promise.all(
                 queries.map((query: any) => this.userDB.findMany(query))

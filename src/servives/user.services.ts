@@ -46,7 +46,22 @@ export class User {
                 },
                 history: true,
                 timelineOfEvents: true,
-                post: true
+                post: {
+                    include: {
+                        like: {
+                            where: {
+                                userId: userId
+                            }
+                        },
+                        _count: {
+                            select: {
+                                comment: true,
+                                like: true,
+                            },
+                        },
+                        user: true
+                    },
+                }
             }
         })
     }

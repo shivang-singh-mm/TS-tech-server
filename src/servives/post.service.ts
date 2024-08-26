@@ -111,7 +111,11 @@ export class Post {
                 date: 'desc',
             },
             include: {
-                like: true,
+                like: {
+                    where: {
+                        userId: userId
+                    }
+                },
                 _count: {
                     select: {
                         comment: true,
