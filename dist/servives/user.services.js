@@ -108,5 +108,13 @@ class User {
             }
         });
     }
+    async checkFollow(userId, foreignId) {
+        return this.follow.findMany({
+            where: {
+                followeeUserId: userId,
+                followerUserId: foreignId
+            }
+        });
+    }
 }
 exports.User = User;

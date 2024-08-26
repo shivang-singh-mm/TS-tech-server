@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUerProfile = exports.updateUSerInfo = exports.getFiltereduser = exports.getGeneralizeduser = exports.getTimelineEvents = exports.addTimelineEvent = exports.unfollowUserById = exports.getFollowersCountById = exports.getFollowingById = exports.getFollowersById = exports.followUserById = exports.deleteUserById = exports.getAllUsers = exports.LoginUser = exports.RegisterUser = void 0;
+exports.checkFollow = exports.updateUerProfile = exports.updateUSerInfo = exports.getFiltereduser = exports.getGeneralizeduser = exports.getTimelineEvents = exports.addTimelineEvent = exports.unfollowUserById = exports.getFollowersCountById = exports.getFollowingById = exports.getFollowersById = exports.followUserById = exports.deleteUserById = exports.getAllUsers = exports.LoginUser = exports.RegisterUser = void 0;
 const client_1 = require("@prisma/client");
 const http_status_codes_1 = require("http-status-codes");
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -312,3 +312,21 @@ const updateUerProfile = async (req, res) => {
     }
 };
 exports.updateUerProfile = updateUerProfile;
+const checkFollow = async (req, res) => {
+    const data = {
+        userId: req.body.userId,
+        foreignId: req.body.foreignId
+    };
+    try {
+        if (!data.userId || data.userId == " " || !data.foreignId || data.foreignId == " ")
+            return res.status(409).json({ success: false, message: "Enter id of user" });
+        const user = new user_services_1.User;
+        const body = await user.checkFollow(data.userId, data.foreignId);
+        return res.status(200).json({ success: true, message: "Successfully checked follow", body: body });
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(400).json({ success: false, message: "Unable to check follow" });
+    }
+};
+exports.checkFollow = checkFollow;

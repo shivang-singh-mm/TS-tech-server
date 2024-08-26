@@ -50,6 +50,7 @@ router.get('/get/filter/:userId', jwt_auth_1.jwtVerify, userController_1.getFilt
 router.get('/get/recommendation/:userId', jwt_auth_1.jwtVerify, activity_controller_1.recommendationAPI);
 router.put('/update/info', jwt_auth_1.jwtVerify, userController_1.updateUSerInfo);
 router.put('/update/profile', jwt_auth_1.jwtVerify, userController_1.updateUerProfile);
+router.post('/check/follow', jwt_auth_1.jwtVerify, userController_1.checkFollow);
 // Histoy Routes
 router.post('/history/create', jwt_auth_1.jwtVerify, history_controller_1.createHistory);
 router.get('/history/get/:userId', jwt_auth_1.jwtVerify, history_controller_1.getHistory);

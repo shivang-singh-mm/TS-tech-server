@@ -39,6 +39,7 @@ const http_1 = __importDefault(require("http"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const app = express.default();
 const PORT = process.env.PORT;
+const originUrl = process.env.ALLOW_ORIGIN_URL;
 // activateRedis(redisClient);
 app.use((0, cookie_parser_1.default)());
 app.use(body_parser_1.default.urlencoded({ extended: false }));
@@ -56,7 +57,7 @@ app.use(body_parser_1.default.json());
 //   })
 // );
 app.use((0, cors_1.default)({
-    origin: 'https://starlit-lollipop-0f4e22.netlify.app', // Your frontend's origin
+    origin: originUrl, // Your frontend's origin
     credentials: true // Allow cookies to be sent with requests
 }));
 app.use("/api/v1/users", userRoutes_1.default);
