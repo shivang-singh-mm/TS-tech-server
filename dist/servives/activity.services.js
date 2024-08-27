@@ -15,28 +15,29 @@ class Activity {
             }
         });
         if (check != null) {
-            console.log(typeof check.sectors[0]);
-            if (check.sectors.length == 3) {
-                let ar = [check.sectors[1], check.sectors[2], data.sectors];
-                return this.activityDB.update({
-                    where: {
-                        userId: data.userId
-                    },
-                    data: {
-                        sectors: ar
-                    }
-                });
-            }
-            else {
-                let ar = [...check.sectors, data.sectors];
-                return this.activityDB.update({
-                    where: {
-                        userId: data.userId
-                    },
-                    data: {
-                        sectors: ar
-                    }
-                });
+            if (!check.sectors.includes(data.sectors)) {
+                if (check.sectors.length == 3) {
+                    let ar = [check.sectors[1], check.sectors[2], data.sectors];
+                    return this.activityDB.update({
+                        where: {
+                            userId: data.userId
+                        },
+                        data: {
+                            sectors: ar
+                        }
+                    });
+                }
+                else {
+                    let ar = [...check.sectors, data.sectors];
+                    return this.activityDB.update({
+                        where: {
+                            userId: data.userId
+                        },
+                        data: {
+                            sectors: ar
+                        }
+                    });
+                }
             }
         }
         var body = {
@@ -72,7 +73,12 @@ class Activity {
         }
         else {
             const queries = check.sectors.map(sector => ({
-                where: { purpose: sector },
+                where: {
+                    purpose: sector,
+                    userId: {
+                        not: userId
+                    }
+                },
                 take: 3,
                 include: {
                     followers: {
@@ -82,7 +88,32 @@ class Activity {
                     }
                 }
             }));
-            return await Promise.all(queries.map((query) => this.userDB.findMany(query)));
+            const result = Promise.all(queries.map((query) => this.userDB.findMany(query)));
+            var flatResult = (await result).flat();
+            const sectors = check.sectors;
+            var combineResult = [];
+            if (flatResult.length < 9) {
+                combineResult = await this.userDB.findMany({
+                    where: {
+                        purpose: {
+                            notIn: sectors
+                        },
+                        userId: {
+                            not: userId
+                        }
+                    },
+                    take: 9 - flatResult.length,
+                    include: {
+                        followers: {
+                            where: {
+                                followeeUserId: userId
+                            }
+                        }
+                    }
+                });
+            }
+            flatResult = [...flatResult, ...combineResult];
+            return flatResult;
         }
     }
 }
