@@ -67,7 +67,6 @@ export class Post {
         var followeeUserId: any = users.map(item => {
             return item.followerUserId
         })
-        console.log(followeeUserId)
         followeeUserId.push(userId)
         if (followeeUserId.length == 0) throw new Error("No User");
         return this.postDB.findMany({

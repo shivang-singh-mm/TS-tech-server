@@ -19,12 +19,6 @@ export class ProfileView {
         })
         if (result.length
             != 0) {
-            console.log(await this.profileViewDB.findMany({
-                where: {
-                    viewEmail: data.email,
-                    userId: data.userId
-                }
-            }));
             return this.profileViewDB.updateMany({
                 where: {
                     viewEmail: data.email,

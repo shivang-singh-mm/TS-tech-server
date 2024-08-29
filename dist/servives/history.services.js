@@ -8,7 +8,6 @@ class History {
         this.historyDB = prsima.history;
     }
     async createHistory(data) {
-        console.log(data);
         return this.historyDB.create({ data });
     }
     async getHistory(userId) {

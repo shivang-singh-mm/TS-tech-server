@@ -53,7 +53,6 @@ class Post {
         var followeeUserId = users.map(item => {
             return item.followerUserId;
         });
-        console.log(followeeUserId);
         followeeUserId.push(userId);
         if (followeeUserId.length == 0)
             throw new Error("No User");

@@ -19,7 +19,6 @@ export class History {
     }
 
     async createHistory(data: historyInterface) {
-        console.log(data);
         return this.historyDB.create({ data })
     }
 
