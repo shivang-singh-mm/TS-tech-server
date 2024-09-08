@@ -45,6 +45,7 @@ import { createHistory, deleteHistory, getHistory } from "../controllers/history
 import { recommendationAPI } from "../controllers/activity.controller";
 import { createView, getView } from "../controllers/profile.view.controller";
 import { sendEmailForOtp } from "../controllers/send.email";
+import { getNotification } from "../controllers/notification.controller";
 
 const router: Router = Router();
 
@@ -145,6 +146,10 @@ router.get('/profile/view/get/:email', jwtVerify, getView);
 
 
 router.get('/otp', sendEmailForOtp);
+
+
+// Notification
+router.get('/notification/:userId', jwtVerify, getNotification);
 
 router.get('/noti', (req: Request, res: Response) => {
   io.emit('updateNotifications', "This is notification pannel");

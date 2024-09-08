@@ -30,6 +30,12 @@ enum LIKETYPES {
   COMMENT
 }
 
+enum NOTIFICATIONTYPE {
+  LIKE
+  COMMENT
+  FOLLOW
+}
+
 model users {
   userId           String          @id @default(uuid())
   name             String
@@ -50,6 +56,7 @@ model users {
   jobTitle         String?
   companyId        String?
   experience       String?
+  tags             String[]
   followers        follow[]        @relation("UserFollowers")
   following        follow[]        @relation("UserFollowing")
   timelineOfEvents timeline[]      @relation("Timeline")
@@ -58,8 +65,9 @@ model users {
   commentPost      comment[]
   history          history[]
   activity         activity[]
-  notification     notification[]
   profileViewed    profileViewed[]
+  redirect         notification[]  @relation("Redirect")
+  mainUser         notification[]  @relation("Main User")
 }
 
 model follow {
@@ -85,18 +93,17 @@ model timeline {
 }
 
 model post {
-  id           String         @id @default(uuid())
-  date         DateTime       @default(now())
-  mediaLink    String[]
-  caption      String
-  description  String
-  tags         String[]
-  landmark     String
-  user         users          @relation(fields: [userId], references: [userId])
-  userId       String
-  like         like[]
-  comment      comment[]
-  notification notification[]
+  id          String    @id @default(uuid())
+  date        DateTime  @default(now())
+  mediaLink   String[]
+  caption     String
+  description String
+  tags        String[]
+  landmark    String
+  user        users     @relation(fields: [userId], references: [userId])
+  userId      String
+  like        like[]
+  comment     comment[]
 }
 
 model comment {
@@ -140,22 +147,27 @@ model history {
 }
 
 model notification {
-  id          String  @id @default(uuid())
-  title       String  @default("You got a new notification.")
-  description String
-  url         String?
-  post        post?   @relation(fields: [postId], references: [id])
-  postId      String?
-  user        users?  @relation(fields: [userId], references: [userId])
-  userId      String?
-  read        Boolean
+  id               String           @id @default(uuid())
+  title            String           @default("You got a new notification.")
+  notificationType NOTIFICATIONTYPE
+  read             Boolean
+  name             String
+  picture          String
+  time             DateTime         @default(now())
+
+  redirect   users  @relation(fields: [redirectId], references: [userId], name: "Redirect")
+  user       users  @relation(fields: [userId], references: [userId], name: "Main User")
+  userId     String
+  redirectId String
 }
 
 model activity {
-  id      String    @id @default(uuid())
-  user    users     @relation(fields: [userId], references: [userId])
-  userId  String    @unique
-  sectors PURPOSE[]
+  id       String    @id @default(uuid())
+  user     users     @relation(fields: [userId], references: [userId])
+  userId   String    @unique
+  sectors  PURPOSE[]
+  location String[]
+  tags     String[]
 }
 
 model profileViewed {

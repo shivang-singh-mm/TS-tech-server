@@ -2,13 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Comment = void 0;
 const client_1 = require("@prisma/client");
+const notification_services_1 = require("./notification.services");
 const prisma = new client_1.PrismaClient;
 class Comment {
     constructor() {
         this.commentDB = prisma.comment;
         this.userDB = prisma.users;
+        this.postDB = prisma.post;
     }
-    async createComment(data, mentionId) {
+    async createComment(data, mentionId, picture, name) {
         if (mentionId) {
             const userEmail = await this.userDB.findUnique({
                 where: {
@@ -21,6 +23,26 @@ class Comment {
             if (userEmail?.email == null)
                 throw new Error("User does not exists");
             data.mentionMail = userEmail.email;
+        }
+        if (data.postId) {
+            const userId = await this.postDB.findUnique({
+                where: {
+                    id: data.postId
+                },
+                include: {
+                    user: true
+                }
+            });
+            const notification = new notification_services_1.Notification;
+            const notificationBody = {
+                userId: userId?.userId,
+                redirectId: data.userId,
+                notificationType: 'COMMENT',
+                name: name,
+                picture: picture,
+                read: false
+            };
+            await notification.createNotification(notificationBody);
         }
         return this.commentDB.create({ data });
     }

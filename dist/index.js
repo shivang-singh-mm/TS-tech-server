@@ -71,6 +71,7 @@ exports.io.on('connection', (socket) => {
         console.log(`User ${userId} joined room`);
     });
     socket.on('newNotification', (notification) => {
+        console.log("kk");
         exports.io.to('user_12346').emit('updateNotifications', "notification");
     });
     socket.on('disconnect', () => {

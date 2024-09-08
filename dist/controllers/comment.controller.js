@@ -10,15 +10,17 @@ const createComment = async (req, res) => {
         postId: req.body.postId,
         parentCommentId: req.body.parentCommentId,
         commentType: req.body.commentType,
-        mentionMail: null
+        mentionMail: null,
     };
+    const picture = req.body.picture;
+    const name = req.body.name;
     try {
         if (data.text == "" || data.text == " ")
             return res.status(409).json({ success: false, message: "Enter valid inputs" });
         if (((data.postId == "" || data.postId == " ") && (data.parentCommentId == " " || data.parentCommentId == " ")) || (data.postId?.length && data.parentCommentId?.length))
             return res.status(409).json({ success: false, message: "Enter valid inputs" });
         const comment = new comment_service_1.Comment;
-        const body = await comment.createComment(data, req.body.mentionId);
+        const body = await comment.createComment(data, req.body.mentionId, picture, name);
         return res.status(200).json({ success: true, message: "Successfully created comment", body: body });
     }
     catch (err) {

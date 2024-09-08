@@ -13,6 +13,7 @@ const history_controller_1 = require("../controllers/history.controller");
 const activity_controller_1 = require("../controllers/activity.controller");
 const profile_view_controller_1 = require("../controllers/profile.view.controller");
 const send_email_1 = require("../controllers/send.email");
+const notification_controller_1 = require("../controllers/notification.controller");
 const router = (0, express_1.Router)();
 router.post("/register", userValidationMiddleware_1.userRegisterValidation, userController_1.RegisterUser);
 router.post("/login", userValidationMiddleware_1.userLoginValidation, userController_1.LoginUser);
@@ -59,6 +60,8 @@ router.delete('/history/delete/:historyId', jwt_auth_1.jwtVerify, history_contro
 router.post('/profile/view/create', jwt_auth_1.jwtVerify, profile_view_controller_1.createView);
 router.get('/profile/view/get/:email', jwt_auth_1.jwtVerify, profile_view_controller_1.getView);
 router.get('/otp', send_email_1.sendEmailForOtp);
+// Notification
+router.get('/notification/:userId', jwt_auth_1.jwtVerify, notification_controller_1.getNotification);
 router.get('/noti', (req, res) => {
     __1.io.emit('updateNotifications', "This is notification pannel");
     res.send({ Health: "Prod Healt Check Fine", Version: "v0.0" });

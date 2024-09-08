@@ -66,8 +66,7 @@ export class User {
         })
     }
 
-    async getFiltereduser(userId: string, name: string | null, city: string | null, purpose: string | null, experience: string | null, jobTitle: string | null) {
-        // var wname = name;
+    async getFiltereduser(userId: string, name: string | null, city: string | null, purpose: string | null, experience: string | null, tags: any) {
         var whereClause: any = {
             userId: {
                 not: userId
@@ -81,20 +80,23 @@ export class User {
                 },
             };
         }
-        // var sectors: any = PURPOSE[purpose];
-        // if (city)
-        //     whereClause.city = city;
-        // console.log(purpose, experience, jobTitle, name, "hhh")
-        if (experience != null)
+        if (city)
+            whereClause.city = city
+        if (experience)
             whereClause.experience = experience;
-        // if (jobTitle)
-        //     whereClause.jobTitle = jobTitle
-        if (purpose != null && purpose != 'All') {
+        if (tags)
+            whereClause.tags = {
+                has: tags
+            }
+        if (purpose && purpose != 'All')
             whereClause.purpose = purpose;
+        if (tags || city || purpose) {
             const activity = new Activity;
-            const body: activity = {
+            const body: any = {
                 userId: userId,
-                sectors: purpose
+                sectors: purpose ? purpose : null,
+                tags: tags ? tags : null,
+                location: city ? city : null
             }
             await activity.createActivity(body)
         }

@@ -11,13 +11,15 @@ export const createLike = async (req: Request, res: Response) => {
         userId: req.body.userId,
         postId: req.body.postId ? req.body.postId : null,
         commentId: req.body.commentId ? req.body.commentId : null,
-        likeType: req.body.likeType
+        likeType: req.body.likeType,
     }
+    const picture = req.body.picture
+    const name = req.body.name
     try {
         if ((data.postId == "" || data.postId == " ") && (data.commentId == "" || data.commentId == " "))
             return res.status(409).json({ success: false, message: "Enter valid inputs" })
         const like = new Like;
-        const body = await like.createLike(data);
+        const body = await like.createLike(data, picture, name);
         return res.status(200).json({ success: true, message: "Successfully created like", body: body })
     }
     catch (err) {

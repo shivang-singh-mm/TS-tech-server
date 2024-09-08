@@ -9,8 +9,32 @@ export class Notification {
         this.notificationDb = prisma.notification;
     }
     async createNotification(data: any) {
-        await this.notificationDb.create(data);
-        io.to(`user_123456`).emit('updateNotifications', "data12");
         return this.notificationDb.create({ data });
     }
+
+    async getNotification(userId: any) {
+        return this.notificationDb.findMany({
+            where: {
+                userId: userId
+            },
+            include: {
+                redirect: true
+            },
+            orderBy: {
+                time: 'desc'
+            }
+        })
+    }
+
+    async markReadNotification(notiId: string) {
+        return this.notificationDb.update({
+            where: {
+                id: notiId
+            },
+            data: {
+                read: true
+            }
+        })
+    }
+
 }

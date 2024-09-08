@@ -16,34 +16,43 @@ class Activity {
         });
         if (check != null) {
             if (!check.sectors.includes(data.sectors)) {
-                if (check.sectors.length == 3) {
-                    let ar = [check.sectors[1], check.sectors[2], data.sectors];
-                    return this.activityDB.update({
-                        where: {
-                            userId: data.userId
-                        },
-                        data: {
-                            sectors: ar
-                        }
-                    });
+                let sector = check.sectors ? check.sectors : [];
+                let location = check.location ? check.location : [];
+                let tags = check.tags ? check.tags : [];
+                if (data.sectors) {
+                    if (sector?.length === 3)
+                        sector.shift();
+                    sector?.push(data.sectors);
                 }
-                else {
-                    let ar = [...check.sectors, data.sectors];
-                    return this.activityDB.update({
-                        where: {
-                            userId: data.userId
-                        },
-                        data: {
-                            sectors: ar
-                        }
-                    });
+                if (data.location) {
+                    if (location?.length === 3)
+                        location?.shift();
+                    location?.push(data.location);
                 }
+                if (data.tags) {
+                    if (tags?.length === 3)
+                        tags.shift();
+                    tags?.push(data.tags);
+                }
+                return this.activityDB.update({
+                    where: {
+                        userId: data.userId
+                    },
+                    data: {
+                        sectors: sector ? sector : [],
+                        location: location ? location : [],
+                        tags: tags ? tags : []
+                    }
+                });
             }
         }
         var body = {
             userId: data.userId,
-            sectors: [data.sectors]
+            sectors: data.sectors ? [data.sectors] : [],
+            location: data.location ? [data.location] : [],
+            tags: data.tags ? [data.tags] : []
         };
+        // if(this)
         return this.activityDB.create({
             data: body
         });
@@ -77,7 +86,17 @@ class Activity {
                     purpose: sector,
                     userId: {
                         not: userId
-                    }
+                    },
+                    ...(check?.tags?.length && {
+                        tags: {
+                            hasSome: check.tags // Assuming 'tags' is an array field in the database
+                        }
+                    }),
+                    ...(check?.location && {
+                        city: {
+                            in: check.location
+                        } // Adjust field name as per your database schema
+                    })
                 },
                 take: 3,
                 include: {

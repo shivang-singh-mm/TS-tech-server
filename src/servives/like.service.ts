@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { Notification } from "./notification.services";
 
 const prisma = new PrismaClient;
 
@@ -6,16 +7,18 @@ interface likesInterface {
     userId: string;
     postId: string;
     commentId: string;
-    likeType: any
+    likeType: any,
 }
 
 export class Like {
     readonly likeDB;
+    readonly postDB;
     constructor() {
         this.likeDB = prisma.like;
+        this.postDB = prisma.post;
     }
 
-    async createLike(data: likesInterface) {
+    async createLike(data: likesInterface, picture: string, name: string) {
         if (await this.likeDB.findFirst({
             where: {
                 postId: data.postId,
@@ -23,6 +26,24 @@ export class Like {
                 userId: data.userId
             }
         }) != null) throw new Error("Like already Exists");
+
+        if (data.postId) {
+            const userId = await this.postDB.findUnique({
+                where: {
+                    id: data.postId
+                }
+            })
+            const notification = new Notification;
+            const notificationBody: any = {
+                userId: userId?.userId,
+                redirectId: data.userId,
+                name: name,
+                picture: picture,
+                notificationType: 'LIKE',
+                read: false
+            }
+            if (userId?.userId != data.userId) await notification.createNotification(notificationBody)
+        }
 
         return this.likeDB.create({ data })
     }

@@ -57,8 +57,7 @@ class User {
             }
         });
     }
-    async getFiltereduser(userId, name, city, purpose, experience, jobTitle) {
-        // var wname = name;
+    async getFiltereduser(userId, name, city, purpose, experience, tags) {
         var whereClause = {
             userId: {
                 not: userId
@@ -72,20 +71,23 @@ class User {
                 },
             };
         }
-        // var sectors: any = PURPOSE[purpose];
-        // if (city)
-        //     whereClause.city = city;
-        // console.log(purpose, experience, jobTitle, name, "hhh")
-        if (experience != null)
+        if (city)
+            whereClause.city = city;
+        if (experience)
             whereClause.experience = experience;
-        // if (jobTitle)
-        //     whereClause.jobTitle = jobTitle
-        if (purpose != null && purpose != 'All') {
+        if (tags)
+            whereClause.tags = {
+                has: tags
+            };
+        if (purpose && purpose != 'All')
             whereClause.purpose = purpose;
+        if (tags || city || purpose) {
             const activity = new activity_services_1.Activity;
             const body = {
                 userId: userId,
-                sectors: purpose
+                sectors: purpose ? purpose : null,
+                tags: tags ? tags : null,
+                location: city ? city : null
             };
             await activity.createActivity(body);
         }

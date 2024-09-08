@@ -9,6 +9,7 @@ const http_status_codes_1 = require("http-status-codes");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = require("jsonwebtoken");
 const user_services_1 = require("../servives/user.services");
+const notification_services_1 = require("../servives/notification.services");
 const prisma = new client_1.PrismaClient();
 const privatekey = process.env.PRIVATE_KEY;
 const RegisterUser = async (req, res, next) => {
@@ -93,6 +94,8 @@ const followUserById = async (req, res, next) => {
     try {
         const followeeUserId = req.body.followeeUserId;
         const followerUserId = req.body.followerUserId;
+        const picture = req.body.picture;
+        const name = req.body.name;
         const followTransaction = await prisma.follow.create({
             data: {
                 followeeUserId: followeeUserId,
@@ -100,6 +103,16 @@ const followUserById = async (req, res, next) => {
                 status: true,
             },
         });
+        const notification = new notification_services_1.Notification;
+        const notiBody = {
+            userId: followerUserId,
+            redirectId: followeeUserId,
+            notificationType: 'FOLLOW',
+            name: name,
+            picture: picture,
+            read: false
+        };
+        await notification.createNotification(notiBody);
         res.status(http_status_codes_1.StatusCodes.ACCEPTED).json(followTransaction);
     }
     catch (error) {
@@ -251,14 +264,15 @@ const getFiltereduser = async (req, res) => {
         name: req.query.name ? req.query.name.toString().trim() : null,
         sector: req.query.sector ? req.query.sector.toString().trim() : null,
         city: req.query.city ? req.query.city.toString().trim() : null,
-        jobTitle: req.query.jobTitle ? req.query.jobTitle.toString().trim() : null,
+        tag: req.query.tag ? req.query.tag.toString().trim() : null,
         experience: req.query.experience ? req.query.experience.toString().trim() : null
     };
     try {
         // if ((data.userId && data.email) || ((!data.userId && !data.email)))
         //   return res.status(409).json({ success: false, message: "Enter either email or id of user" })
+        console.log(req.query);
         const user = new user_services_1.User;
-        const body = await user.getFiltereduser(data.userId, data.name, data.city, data.sector, data.experience, data.jobTitle);
+        const body = await user.getFiltereduser(data.userId, data.name, data.city, data.sector, data.experience, data.tag);
         return res.status(200).json({ success: true, message: "Successfully retrieved filtered user", body: body });
     }
     catch (err) {
@@ -271,12 +285,13 @@ const updateUSerInfo = async (req, res) => {
     const data = {
         githubURL: req.body.githubURL,
         companyId: req.body.companyId,
-        purpose: req.query.sector,
+        purpose: req.body.purpose,
         city: req.body.city,
         jobTitle: req.body.jobTitle,
         aboutJobTitle: req.body.aboutJobTitle,
         linkedInURL: req.body.linkedInURL,
-        experience: req.query.experience
+        experience: req.body.experience,
+        tags: req.body.tags
     };
     const userId = req.body.userId;
     try {

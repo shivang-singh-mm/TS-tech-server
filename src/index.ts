@@ -58,7 +58,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('newNotification', (notification: any) => {
-
+    console.log("kk")
     io.to('user_12346').emit('updateNotifications', "notification");
   });
 

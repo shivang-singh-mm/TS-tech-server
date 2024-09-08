@@ -2,12 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Like = void 0;
 const client_1 = require("@prisma/client");
+const notification_services_1 = require("./notification.services");
 const prisma = new client_1.PrismaClient;
 class Like {
     constructor() {
         this.likeDB = prisma.like;
+        this.postDB = prisma.post;
     }
-    async createLike(data) {
+    async createLike(data, picture, name) {
         if (await this.likeDB.findFirst({
             where: {
                 postId: data.postId,
@@ -16,6 +18,23 @@ class Like {
             }
         }) != null)
             throw new Error("Like already Exists");
+        if (data.postId) {
+            const userId = await this.postDB.findUnique({
+                where: {
+                    id: data.postId
+                }
+            });
+            const notification = new notification_services_1.Notification;
+            const notificationBody = {
+                userId: userId?.userId,
+                redirectId: data.userId,
+                name: name,
+                picture: picture,
+                notificationType: 'LIKE',
+                read: false
+            };
+            await notification.createNotification(notificationBody);
+        }
         return this.likeDB.create({ data });
     }
     async getLike(postId, commentId) {
