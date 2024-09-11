@@ -68,6 +68,9 @@ model users {
   profileViewed    profileViewed[]
   redirect         notification[]  @relation("Redirect")
   mainUser         notification[]  @relation("Main User")
+  messagesFrom     message[]  @relation("fromUser")
+  messagesTo       message[]  @relation("toUser")
+  chatRooms        chatRoom[] @relation("ChatRoomParticipants")
 }
 
 model follow {
@@ -176,4 +179,22 @@ model profileViewed {
   userId    String
   date      DateTime
   viewEmail String
+}
+
+model message {
+  id         BigInt    @id @default(autoincrement())
+  content    String
+  fromId     String
+  from       users     @relation(fields: [fromId], references: [userId], name: "fromUser")
+  toId       String
+  to         users     @relation(fields: [toId], references: [userId], name: "toUser")
+  chatRoomId String?
+  chatRoom   chatRoom? @relation(fields: [chatRoomId], references: [id], name: "ChatRoomMessages")
+  timeStamp  DateTime  @default(now())
+}
+
+model chatRoom {
+  id           String    @id @default(uuid())
+  participants users[]   @relation("ChatRoomParticipants")
+  messages     message[] @relation("ChatRoomMessages")
 }
