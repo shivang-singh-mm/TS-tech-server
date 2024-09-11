@@ -151,5 +151,22 @@ export class User {
         })
     }
 
+    async updatePassword(email: string, password: string) {
+        const check = this.user.findUnique({
+            where: {
+                email: email
+            }
+        });
+        if (check === null) return "No such user"
+        return this.user.update({
+            where: {
+                email: email
+            },
+            data: {
+                password: password
+            }
+        })
+    }
+
 }
 

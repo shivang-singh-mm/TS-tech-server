@@ -136,5 +136,22 @@ class User {
             }
         });
     }
+    async updatePassword(email, password) {
+        const check = this.user.findUnique({
+            where: {
+                email: email
+            }
+        });
+        if (check === null)
+            return "No such user";
+        return this.user.update({
+            where: {
+                email: email
+            },
+            data: {
+                password: password
+            }
+        });
+    }
 }
 exports.User = User;

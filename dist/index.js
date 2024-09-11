@@ -37,6 +37,7 @@ const socketio = __importStar(require("socket.io"));
 const cors_1 = __importDefault(require("cors"));
 const http_1 = __importDefault(require("http"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const socketHandler_1 = __importDefault(require("./controllers/socketHandler"));
 const app = express.default();
 const PORT = process.env.PORT;
 const originUrl = process.env.ALLOW_ORIGIN_URL;
@@ -58,24 +59,25 @@ app.use(body_parser_1.default.json());
 // );
 app.use((0, cors_1.default)({
     origin: originUrl, // Your frontend's origin
-    credentials: true // Allow cookies to be sent with requests
+    credentials: true, // Allow cookies to be sent with requests
 }));
 app.use("/api/v1/users", userRoutes_1.default);
 app.use(errorHandler_1.errorHandler);
 const server = http_1.default.createServer(app);
 exports.io = new socketio.Server(server);
-exports.io.on('connection', (socket) => {
-    console.log('New client connected', socket.id);
-    socket.on('joinRoom', (userId) => {
+(0, socketHandler_1.default)(exports.io);
+exports.io.on("connection", (socket) => {
+    console.log("New client connected", socket.id);
+    socket.on("joinRoom", (userId) => {
         socket.join(`user_${userId}`);
         console.log(`User ${userId} joined room`);
     });
-    socket.on('newNotification', (notification) => {
+    socket.on("newNotification", (notification) => {
         console.log("kk");
-        exports.io.to('user_12346').emit('updateNotifications', "notification");
+        exports.io.to("user_12346").emit("updateNotifications", "notification");
     });
-    socket.on('disconnect', () => {
-        console.log('Client disconnected');
+    socket.on("disconnect", () => {
+        console.log("Client disconnected");
     });
 });
 server.listen(PORT, () => {

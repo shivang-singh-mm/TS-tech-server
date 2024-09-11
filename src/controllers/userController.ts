@@ -392,3 +392,26 @@ export const checkFollow = async (req: Request, res: Response) => {
     return res.status(400).json({ success: false, message: "Unable to check follow" });
   }
 }
+
+
+export const UpdatePassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const salt: string = await bcrypt.genSalt(10);
+    const hashedPassword: string = await bcrypt.hash(req.body.password, salt);
+    const user: users = await prisma.users.update({
+      where: {
+        userId: req.body.userId
+      },
+      data: {
+        password: hashedPassword
+      }
+    });
+    res.status(StatusCodes.ACCEPTED).json(user);
+  } catch (error) {
+    next(error);
+  }
+};

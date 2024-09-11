@@ -42,7 +42,8 @@ class Comment {
                 picture: picture,
                 read: false
             };
-            await notification.createNotification(notificationBody);
+            if (userId?.userId != data.userId)
+                await notification.createNotification(notificationBody);
         }
         return this.commentDB.create({ data });
     }

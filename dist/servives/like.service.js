@@ -33,7 +33,8 @@ class Like {
                 notificationType: 'LIKE',
                 read: false
             };
-            await notification.createNotification(notificationBody);
+            if (userId?.userId != data.userId)
+                await notification.createNotification(notificationBody);
         }
         return this.likeDB.create({ data });
     }

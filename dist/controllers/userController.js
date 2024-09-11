@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkFollow = exports.updateUerProfile = exports.updateUSerInfo = exports.getFiltereduser = exports.getGeneralizeduser = exports.getTimelineEvents = exports.addTimelineEvent = exports.unfollowUserById = exports.getFollowersCountById = exports.getFollowingById = exports.getFollowersById = exports.followUserById = exports.deleteUserById = exports.getAllUsers = exports.LoginUser = exports.RegisterUser = void 0;
+exports.UpdatePassword = exports.checkFollow = exports.updateUerProfile = exports.updateUSerInfo = exports.getFiltereduser = exports.getGeneralizeduser = exports.getTimelineEvents = exports.addTimelineEvent = exports.unfollowUserById = exports.getFollowersCountById = exports.getFollowingById = exports.getFollowersById = exports.followUserById = exports.deleteUserById = exports.getAllUsers = exports.LoginUser = exports.RegisterUser = void 0;
 const client_1 = require("@prisma/client");
 const http_status_codes_1 = require("http-status-codes");
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -345,3 +345,22 @@ const checkFollow = async (req, res) => {
     }
 };
 exports.checkFollow = checkFollow;
+const UpdatePassword = async (req, res, next) => {
+    try {
+        const salt = await bcrypt_1.default.genSalt(10);
+        const hashedPassword = await bcrypt_1.default.hash(req.body.password, salt);
+        const user = await prisma.users.update({
+            where: {
+                userId: req.body.userId
+            },
+            data: {
+                password: hashedPassword
+            }
+        });
+        res.status(http_status_codes_1.StatusCodes.ACCEPTED).json(user);
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.UpdatePassword = UpdatePassword;
