@@ -38,20 +38,38 @@ import {
   checkLoggedIn,
 } from "../authorisationMiddleware/userAuthMiddleware";
 import { jwtVerify } from "../authorisationMiddleware/jwt.auth";
-import { getGeneralizedFeed, getUserFeed, postCreate } from "../controllers/post.controller";
-import { createLike, deleteLike, getLike } from "../controllers/like.controller";
+import {
+  getGeneralizedFeed,
+  getUserFeed,
+  postCreate,
+} from "../controllers/post.controller";
+import {
+  createLike,
+  deleteLike,
+  getLike,
+} from "../controllers/like.controller";
 import { createComment, getComment } from "../controllers/comment.controller";
-import { createHistory, deleteHistory, getHistory } from "../controllers/history.controller";
+import {
+  createHistory,
+  deleteHistory,
+  getHistory,
+} from "../controllers/history.controller";
 import { recommendationAPI } from "../controllers/activity.controller";
 import { createView, getView } from "../controllers/profile.view.controller";
 import { sendEmailForOtp } from "../controllers/send.email";
 import { getNotification } from "../controllers/notification.controller";
 
+import {
+  getMsgs,
+  deleteMsg,
+  getChatrooms,
+} from "../controllers/messageController";
+
 const router: Router = Router();
 
 router.post("/register", userRegisterValidation, RegisterUser);
 router.post("/login", userLoginValidation, LoginUser);
-router.post("/getUsers", checkAdmin, jwtVerify, getAllUsers);
+router.post("/getUsers", getAllUsers); //checkAdmin, jwtVerify,
 router.delete("/deleteUser/:userId", deleteUserByIdValidation, deleteUserById);
 router.post("/follow", jwtVerify, followValidation, followUserById);
 router.get(
@@ -93,66 +111,62 @@ router.get(
 
 router.get("/healthCheck", (req: Request, res: Response) => {
   // io.emit('updateNotifications2', "This is notification pannel2");
-  res.send({ Health: "Prod Healt Check Fine", Version: "v0.0" })
-})
+  res.send({ Health: "Prod Healt Check Fine", Version: "v0.0" });
+});
 
 router.get("/checkAuth", jwtVerify, (req: Request, res: Response) => {
   // io.emit('updateNotifications2', "This is notification pannel2");
-  res.send({ Health: "Prod Healt Check Fine", Version: "v0.0" })
-})
-
-
-
+  res.send({ Health: "Prod Healt Check Fine", Version: "v0.0" });
+});
 
 // Post Routes
 
-router.post('/post/create', jwtVerify, postCreate)
-router.get('/post/get/:userId/:page/:pageSize', jwtVerify, getGeneralizedFeed)
-router.get('/post/get/user/:userId/:page/:pageSize', jwtVerify, getUserFeed);
+router.post("/post/create", jwtVerify, postCreate);
+router.get("/post/get/:userId/:page/:pageSize", jwtVerify, getGeneralizedFeed);
+router.get("/post/get/user/:userId/:page/:pageSize", jwtVerify, getUserFeed);
 
 // Like Routes
 
-router.post('/like/create', jwtVerify, createLike);
-router.delete('/like/delete/:userId/', jwtVerify, deleteLike);
-router.get('/like/get', jwtVerify, getLike);
-
+router.post("/like/create", jwtVerify, createLike);
+router.delete("/like/delete/:userId/", jwtVerify, deleteLike);
+router.get("/like/get", jwtVerify, getLike);
 
 // Comment Routes
 
-router.post('/comment/create', jwtVerify, createComment);
-router.get('/comment/get/:page/:pageSize', jwtVerify, getComment);
+router.post("/comment/create", jwtVerify, createComment);
+router.get("/comment/get/:page/:pageSize", jwtVerify, getComment);
 
 // User Routes
 
-router.get('/get/general', jwtVerify, getGeneralizeduser);
-router.get('/get/filter/:userId', jwtVerify, getFiltereduser);
-router.get('/get/recommendation/:userId', jwtVerify, recommendationAPI);
-router.put('/update/info', jwtVerify, updateUSerInfo);
-router.put('/update/profile', jwtVerify, updateUerProfile);
-router.post('/check/follow', jwtVerify, checkFollow);
-
-
+router.get("/get/general", jwtVerify, getGeneralizeduser);
+router.get("/get/filter/:userId", jwtVerify, getFiltereduser);
+router.get("/get/recommendation/:userId", jwtVerify, recommendationAPI);
+router.put("/update/info", jwtVerify, updateUSerInfo);
+router.put("/update/profile", jwtVerify, updateUerProfile);
+router.post("/check/follow", jwtVerify, checkFollow);
 
 // Histoy Routes
 
-router.post('/history/create', jwtVerify, createHistory);
-router.get('/history/get/:userId', jwtVerify, getHistory);
-router.delete('/history/delete/:historyId', jwtVerify, deleteHistory)
-
+router.post("/history/create", jwtVerify, createHistory);
+router.get("/history/get/:userId", jwtVerify, getHistory);
+router.delete("/history/delete/:historyId", jwtVerify, deleteHistory);
 
 // Profile View Routes
-router.post('/profile/view/create', jwtVerify, createView);
-router.get('/profile/view/get/:email', jwtVerify, getView);
+router.post("/profile/view/create", jwtVerify, createView);
+router.get("/profile/view/get/:email", jwtVerify, getView);
 
-
-router.get('/otp', sendEmailForOtp);
-
+router.get("/otp", sendEmailForOtp);
 
 // Notification
-router.get('/notification/:userId', jwtVerify, getNotification);
+router.get("/notification/:userId", jwtVerify, getNotification);
 
-router.get('/noti', (req: Request, res: Response) => {
-  io.emit('updateNotifications', "This is notification pannel");
-  res.send({ Health: "Prod Healt Check Fine", Version: "v0.0" })
-})
+router.get("/noti", (req: Request, res: Response) => {
+  io.emit("updateNotifications", "This is notification pannel");
+  res.send({ Health: "Prod Healt Check Fine", Version: "v0.0" });
+});
+
+router.get("/msgs/:chatRoomId", getMsgs);
+router.post("/delete/msg/:messageId", deleteMsg);
+router.get("/chatroom/:userId", getChatrooms);
+
 export default router;
