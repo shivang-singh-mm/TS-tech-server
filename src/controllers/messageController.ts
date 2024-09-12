@@ -30,7 +30,7 @@ export const getMsgs = async (
         },
       },
       orderBy: {
-        timeStamp: "asc",
+        timeStamp: "desc",
       },
       skip: (page - 1) * pageSize,
       take: pageSize,
@@ -62,7 +62,6 @@ export const getChatrooms = async (
         },
       },
       include: {
-        participants: true,
         messages: {
           orderBy: {
             timeStamp: "desc",
