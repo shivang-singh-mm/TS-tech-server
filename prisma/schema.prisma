@@ -11,13 +11,13 @@ datasource db {
 enum PURPOSE {
   ENTREPRENEUR
   STUDENT
-  BUSINESS
-  SERVICE_PROVIDER
-  FREELANCER
+  STARTUP
+  LEGALITIES
   EMPLOYEE
   RECRUITER
   INVESTOR
-  NETWORK
+  INFLUENCER
+  MARKETING
 }
 
 enum COMMENTTYPES {
@@ -45,7 +45,7 @@ model users {
   phone            String?         @unique @default("")
   phoneCode        String?         @default("")
   city             String?         @default("")
-  purpose          PURPOSE         @default(NETWORK)
+  purpose          PURPOSE         @default(STUDENT)
   githubURL        String?         @default("")
   linkedInURL      String?         @default("")
   aboutYou         String?         @default("")
@@ -68,9 +68,9 @@ model users {
   profileViewed    profileViewed[]
   redirect         notification[]  @relation("Redirect")
   mainUser         notification[]  @relation("Main User")
-  messagesFrom     message[]  @relation("fromUser")
-  messagesTo       message[]  @relation("toUser")
-  chatRooms        chatRoom[] @relation("ChatRoomParticipants")
+  messagesFrom     message[]       @relation("fromUser")
+  messagesTo       message[]       @relation("toUser")
+  chatRooms        chatRoom[]      @relation("ChatRoomParticipants")
 }
 
 model follow {
