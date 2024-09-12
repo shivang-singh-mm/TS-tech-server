@@ -165,8 +165,8 @@ router.get("/noti", (req: Request, res: Response) => {
   res.send({ Health: "Prod Healt Check Fine", Version: "v0.0" });
 });
 
-router.get("/msgs/:chatRoomId", getMsgs);
-router.post("/delete/msg/:messageId", deleteMsg);
-router.get("/chatroom/:userId", getChatrooms);
+router.get("/msgs/:chatRoomId", jwtVerify, getMsgs);
+router.post("/delete/msg/:messageId", jwtVerify, deleteMsg);
+router.get("/chatroom/:userId", jwtVerify, getChatrooms);
 
 export default router;

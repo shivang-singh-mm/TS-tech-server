@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "chatRoom" ADD COLUMN     "lastModified" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

@@ -51,6 +51,7 @@ export const getChatrooms = async (
   next: NextFunction
 ) => {
   const userId = req.params.userId;
+
   try {
     const rooms = await prisma.chatRoom.findMany({
       where: {
@@ -62,9 +63,44 @@ export const getChatrooms = async (
       },
       include: {
         participants: true,
+        messages: {
+          orderBy: {
+            timeStamp: "desc",
+          },
+          take: 1,
+          include: {
+            from: {
+              select: {
+                userId: true,
+                name: true,
+              },
+            },
+            to: {
+              select: {
+                userId: true,
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
-    res.status(StatusCodes.OK).json(rooms);
+
+    const formattedRooms = rooms.map((room) => ({
+      ...room,
+      messages: room.messages.map((message) => ({
+        ...message,
+        id: message.id.toString(),
+      })),
+    }));
+
+    const sortedRooms = formattedRooms.sort((a, b) => {
+      const timeA = new Date(a.messages[0]?.timeStamp || 0).getTime();
+      const timeB = new Date(b.messages[0]?.timeStamp || 0).getTime();
+      return timeB - timeA;
+    });
+
+    res.status(StatusCodes.OK).json(sortedRooms);
   } catch (error) {
     next(error);
   }
