@@ -56,7 +56,7 @@ model users {
   jobTitle         String?
   companyId        String?
   experience       String?
-  tags             String[]
+  tags             String[]        @default([])
   followers        follow[]        @relation("UserFollowers")
   following        follow[]        @relation("UserFollowing")
   timelineOfEvents timeline[]      @relation("Timeline")
