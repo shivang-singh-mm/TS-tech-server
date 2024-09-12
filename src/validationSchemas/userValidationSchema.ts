@@ -34,15 +34,7 @@ export const userRegisterValidationSchema = z.object({
 
   city: z.string().max(20).optional(),
 
-  purpose: z.enum(["ENTREPRENEUR",
-    "STUDENT",
-    "STARTUP",
-    "LEGALITIES",
-    "EMPLOYEE",
-    "RECRUITER",
-    "INVESTOR",
-    "INFLUENCER",
-    "MARKETING"], {
+  purpose: z.enum(["ENTREPRENEUR", "STUDENT", "STARTUP", "LEGALITIES", "EMPLOYEE", "RECRUITER", "INVESTOR", "INFLUENCER", "MARKETING"], {
     required_error: purposeRequiredErrorMsg,
   }),
 

@@ -25,12 +25,12 @@ class Activity {
                     sector?.push(data.sectors);
                 }
                 if (data.location) {
-                    if (location?.length === 3)
+                    if (location?.length === 4)
                         location?.shift();
                     location?.push(data.location);
                 }
                 if (data.tags) {
-                    if (tags?.length === 3)
+                    if (tags?.length === 6)
                         tags.shift();
                     tags?.push(data.tags);
                 }

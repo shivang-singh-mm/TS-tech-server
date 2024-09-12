@@ -26,7 +26,7 @@ exports.userRegisterValidationSchema = zod_1.z.object({
     phone: zod_1.z.string().regex(phoneRegex).optional(),
     phoneCode: zod_1.z.string().regex(phoneCodeRegex).optional(),
     city: zod_1.z.string().max(20).optional(),
-    purpose: zod_1.z.enum(["ENTREPRENEUR", "STUDENT", "BUSINESS", "SERVICE_PROVIDER", "FREELANCER", "EMPLOYEE", "RECRUITER", "INVESTOR", "NETWORK"], {
+    purpose: zod_1.z.enum(["ENTREPRENEUR", "STUDENT", "STARTUP", "LEGALITIES", "EMPLOYEE", "RECRUITER", "INVESTOR", "INFLUENCER", "MARKETING"], {
         required_error: purposeRequiredErrorMsg,
     }),
     githubURL: zod_1.z.string().optional(),
