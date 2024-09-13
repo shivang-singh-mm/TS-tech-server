@@ -166,7 +166,7 @@ router.get("/noti", (req: Request, res: Response) => {
 });
 
 router.get("/msgs/:chatRoomId", getMsgs);
-router.post("/delete/msg/:messageId", deleteMsg);
+router.post("/delete/msg/:messageId", jwtVerify, deleteMsg);
 router.get("/chatroom/:userId", getChatrooms);
 
 export default router;
