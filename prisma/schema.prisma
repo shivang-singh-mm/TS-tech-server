@@ -191,6 +191,7 @@ model message {
   chatRoomId String?
   chatRoom   chatRoom? @relation(fields: [chatRoomId], references: [id], name: "ChatRoomMessages")
   timeStamp  DateTime  @default(now())
+  seen       Boolean   @default(false)
 }
 
 model chatRoom {

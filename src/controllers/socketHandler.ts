@@ -26,12 +26,6 @@ export default (io: Server) => {
       console.log(data);
       const toSocket = USERS.get(data.to) as string;
       console.log(toSocket);
-      if (toSocket !== undefined) {
-        io.to(toSocket).emit("receive-msg", data);
-      } else {
-        console.log(`User ${data.to} not connected`);
-      }
-
       let chatRoom = await prisma.chatRoom.findFirst({
         where: {
           participants: {
@@ -43,7 +37,6 @@ export default (io: Server) => {
           },
         },
       });
-
       if (!chatRoom) {
         chatRoom = await prisma.chatRoom.create({
           data: {
@@ -53,8 +46,7 @@ export default (io: Server) => {
           },
         });
       }
-
-      await prisma.message.create({
+      let message = await prisma.message.create({
         data: {
           fromId: data.from,
           toId: data.to,
@@ -63,6 +55,31 @@ export default (io: Server) => {
           chatRoomId: chatRoom.id,
         },
       });
+      let messageToSend = { ...message, id: message.id.toString() };
+      if (toSocket !== undefined && message !== undefined) {
+        io.to(toSocket).emit("receive-msg", messageToSend);
+      } else {
+        console.log(`User ${data.to} not connected`);
+      }
+    });
+
+    socket.on("read-msgs", async (data) => {
+      try {
+        for (const msgId of data) {
+          await prisma.message.update({
+            where: {
+              id: BigInt(msgId),
+            },
+            data: {
+              seen: true,
+            },
+          });
+        }
+        socket.emit("msgs-updated", { status: "success" });
+      } catch (error) {
+        console.error("Error updating messages: ", error);
+        socket.emit("msgs-updated", { status: "error" });
+      }
     });
 
     socket.on("disconnect", () => {
